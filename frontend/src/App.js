@@ -1,31 +1,31 @@
 import React from 'react';
-import './App.css';
-import Navbar1 from './HomePage/Navbar1';
-import Navbar2 from './HomePage/Navbar2';
-import Footer from './HomePage/Footer';
-import Footer2 from './HomePage/Footer2';
-import Footer3 from './HomePage/Footer3';
-
+import { Routes, Route } from 'react-router-dom';
+import HomePage from './HomePage/Home';
+import SignIn from './Auth/SignIn';
+import Step2 from './Auth/Step2';
+import Login from './Auth/Login';
+import Register from './Auth/Register';
+import AuthReq from './Auth/auth_req';
+import Verify from './utils/Verify';
+import Cart from "./HomePage/Cart"
 function App() {
   return (
-    <div className="w-screen min-h-screen overflow-x-hidden bg-gray-100">
-      {/* Top Navbars */}
-      <Navbar1 />
-      <Navbar2 />
+    <>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/intent" element={<Step2 />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/auth-req" element={<AuthReq />} />
+        <Route path="/verify_otp" element={<Verify />} />
+        <Route path="/cart" element={<Cart />} />
+        {/* Add more routes here */}
+      </Routes>
 
-      {/* Back to Top Section */}
-<div
-  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-  className="bg-gray-700 text-white flex justify-center items-center py-3 cursor-pointer hover:bg-gray-600 transition"
->
-  Back to top
-</div>
-
-      {/* Footer Sections */}
-      <Footer3 />
-      <Footer2 />
-      <Footer />
-    </div>
+      {/* 🔒 reCAPTCHA must be rendered and kept alive */}
+      <div id="recaptcha-container"></div>
+    </>
   );
 }
 

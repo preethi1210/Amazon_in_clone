@@ -14,17 +14,20 @@ const Footer2 = () => {
         {/* Amazon Logo */}
         <img src={amazonLogo} alt="Amazon Logo" className="w-20 h-auto" />
 
-        {/* Globe + English with Dropdown on Hover */}
-        <div className="relative group flex items-center border-white  gap-2 cursor-pointer">
-          <FaGlobe className="text-base" />
-          <span>{selectedLang.toUpperCase()}</span>
+{/* Globe + English with Dropdown on Hover */}
+<div className="relative group flex items-center border-white gap-2 cursor-pointer">
+  <FaGlobe className="text-base" />
+  <span>{selectedLang.toUpperCase()}</span>
 
-          {/* LanguageSelector dropdown visible on group hover */}
-          <LanguageSelector 
-            selectedLang={selectedLang} 
-            setSelectedLang={setSelectedLang} 
-          />
-        </div>
+  {/* LanguageSelector dropdown visible only on group hover */}
+  <div className="absolute top-full left-0 hidden group-hover:block">
+    <LanguageSelector 
+      selectedLang={selectedLang} 
+      setSelectedLang={setSelectedLang} 
+    />
+  </div>
+</div>
+
 
         {/* Country Info */}
 <div className="relative group flex items-center border-white gap-2 cursor-pointer">

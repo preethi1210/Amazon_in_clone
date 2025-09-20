@@ -6,9 +6,11 @@ import CategoryDropdown from './catalog/CategoryDropdown';
 import LanguageSelector from './catalog/LanguageSelector';
 import AccountDropdown from './catalog/AccountDropdown';
 import CartIcon from './catalog/CartIcon';
+import { Link } from "react-router-dom";
 
 const Navbar1 = () => {
-  const [selectedLang, setSelectedLang] = useState('en'); // Default language code
+  const [selectedLang, setSelectedLang] = useState('en');
+  const [showLangDropdown, setShowLangDropdown] = useState(false);
 
   return (
     <div className="text-white w-full">
@@ -33,25 +35,34 @@ const Navbar1 = () => {
           <div className="px-2 flex-grow">
             <CategoryDropdown />
           </div>
+      {/* Language dropdown hover box */}
+      <div
+        className="relative ml-4 z-50"
+        onMouseEnter={() => setShowLangDropdown(true)}
+        onMouseLeave={() => setShowLangDropdown(false)}
+      >
+        {/* Trigger area */}
+        <div className="flex items-center gap-1 px-2 py-1 cursor-pointer rounded-sm border border-transparent hover:border-white transition">
+          <img
+            src="https://flagcdn.com/w40/in.png"
+            alt="India Flag"
+            className="w-5 h-4 object-cover"
+          />
+          <span className="text-xs">{selectedLang.toUpperCase()}</span>
+          <FaChevronDown className="text-xs mt-0.5" />
+        </div>
 
-          {/* Language Selector - uses group for hover */}
-          <div className="group relative border border-transparent hover:border-white rounded-sm transition duration-200 px-2">
-            <div className="flex items-center gap-1 px-2 py-1 cursor-pointer rounded-sm">
-              <img
-                src="https://flagcdn.com/w40/in.png"
-                alt="India Flag"
-                className="w-5 h-4 object-cover"
-              />
-              <span className="text-xs text-white">{selectedLang.toUpperCase()}</span>
-              <FaChevronDown className="text-white text-xs mt-0.5" />
-            </div>
-
-            {/* Dropdown visible only on hover */}
+        {/* Dropdown appears inside the same hoverable div */}
+        {showLangDropdown && (
+          <>
+            <div className="fixed inset-0 bg-black opacity-40 z-40 pointer-events-none" />
             <LanguageSelector
               selectedLang={selectedLang}
               setSelectedLang={setSelectedLang}
             />
-          </div>
+          </>
+        )}
+      </div>
 
           {/* Account */}
           <div className="border border-transparent hover:border-white rounded-sm transition duration-200 group px-2">
@@ -63,10 +74,11 @@ const Navbar1 = () => {
             <span>Returns</span> <span className="font-bold">& Orders</span>
           </div>
 
-          {/* Cart */}
-          <div className="px-2">
-            <CartIcon />
-          </div>
+        <div className="px-2">
+  <Link to="/cart">
+    <CartIcon />
+  </Link>
+</div>
 
         </div>
       </div>
