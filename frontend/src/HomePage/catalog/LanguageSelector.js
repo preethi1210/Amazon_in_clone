@@ -14,9 +14,13 @@ const LanguageSelector = ({ selectedLang, setSelectedLang }) => {
   const handleSelect = (code) => setSelectedLang(code);
 
   return (
-    <div className="absolute top-full left-0 z-50 min-w-[12rem] mt-1 bg-white text-black border border-gray-200 rounded-sm shadow-lg">
+    <div
+      className="absolute top-full left-0 mt-2 min-w-[14rem] bg-white text-black border border-gray-200 rounded-lg shadow-xl z-[1000]"
+      style={{ background: "white" }}
+      onClick={e => e.stopPropagation()} // Prevent clicks from passing to background!
+    >
       <ul className="text-sm">
-        <li className="px-4 py-2 bg-gray-50 font-medium flex items-center gap-2 cursor-default select-none">
+        <li className="px-4 py-2 bg-gray-100 font-semibold flex items-center gap-2 cursor-default select-none rounded-t-lg">
           <span className="w-4 h-4 flex items-center justify-center border border-gray-400 rounded-full">
             <span className="w-2 h-2 bg-orange-500 rounded-full" />
           </span>
@@ -27,7 +31,7 @@ const LanguageSelector = ({ selectedLang, setSelectedLang }) => {
           <li
             key={lang.code}
             onClick={() => handleSelect(lang.code)}
-            className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 select-none"
+            className="px-4 py-2 hover:bg-orange-100 cursor-pointer flex items-center gap-2 select-none transition"
           >
             <span className="w-4 h-4 flex items-center justify-center border border-gray-400 rounded-full">
               {selectedLang === lang.code && (
@@ -39,7 +43,7 @@ const LanguageSelector = ({ selectedLang, setSelectedLang }) => {
         ))}
       </ul>
 
-      <div className="px-4 py-2 text-blue-600 hover:underline text-xs cursor-pointer select-none">
+      <div className="px-4 py-2 text-blue-700 hover:underline text-xs font-medium cursor-pointer select-none transition">
         Learn more
       </div>
 
@@ -49,17 +53,18 @@ const LanguageSelector = ({ selectedLang, setSelectedLang }) => {
         <img
           src="https://flagcdn.com/w40/in.png"
           alt="India Flag"
-          className="w-5 h-4 object-cover"
+          className="w-5 h-4 object-cover rounded"
         />
-        <span>You are shopping on <strong>Amazon.in</strong></span>
+        <span>
+          You are shopping on <strong>Amazon.in</strong>
+        </span>
       </div>
 
-      <div className="px-4 pb-3 text-blue-600 hover:underline text-xs cursor-pointer select-none">
+      <div className="px-4 pb-3 text-blue-700 hover:underline text-xs font-medium cursor-pointer select-none transition">
         Change your country or region
       </div>
     </div>
   );
 };
-
 
 export default LanguageSelector;

@@ -1,48 +1,43 @@
 // src/utils/Verify.js
-import { PhoneAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "../firebase/firebase";
-import axios from "axios"
-export default async function Verify(otp, navigate) {
+import axios from "axios";
+
+const Verify = async (otp, navigate) => {
+  if (!window.confirmationResult) throw new Error("No OTP session found!");
+
   try {
-    // Use in-memory confirmation if present; otherwise reconstruct from localStorage
-    let verificationId =
-      window.confirmationResult?.verificationId ||
-      localStorage.getItem("verificationId");
+    // ✅ 1. Verify OTP with Firebase
+    const result = await window.confirmationResult.confirm(otp);
+    const user = result.user;
+    console.log("✅ OTP verified! Firebase user:", user.phoneNumber);
 
-    if (!verificationId) {
-      throw new Error("No OTP session found. Please resend the OTP.");
-    }
+    // ✅ 2. Get temporarily stored registration data
+    const name = localStorage.getItem("name");
+    const phone = user.phoneNumber; // backend expects "phone"
+    const password = localStorage.getItem("password");
+    const email = localStorage.getItem("email") || ""; // optional
 
-    const credential = PhoneAuthProvider.credential(verificationId, otp);
-    const result = await signInWithCredential(auth, credential);
-    const firebaseUser = result.user;
-    console.log("Verified user:", firebaseUser);
+    // ✅ 3. Register user on backend
+    const { data } = await axios.post("http://localhost:5000/api/auth/register", {
+      name,
+      phone,
+      password,
+      email,
+    });
 
-    // Send user data to backend
-  // src/utils/Verify.js
-const { data } = await axios.post("http://localhost:5000/api/auth/phone", {
-  uid: firebaseUser.uid,
-  phoneNumber: firebaseUser.phoneNumber,
-  email: localStorage.getItem("email") || firebaseUser.email || null,
-  name: localStorage.getItem("name") || firebaseUser.displayName || "",  // ✅ use stored name
-  password: localStorage.getItem("password") || null                    // ✅ save password if you want
-});
-
+    // ✅ 4. Store token & clear local data
     localStorage.setItem("token", data.token);
+    localStorage.removeItem("name");
+    localStorage.removeItem("phoneNumber");
+    localStorage.removeItem("password");
+    localStorage.removeItem("email");
 
-localStorage.setItem("userIdentifier", data.phoneNumber || data.email || "");
-localStorage.setItem("userName", data.name || "");
-
-
-    // Clear temp values
-    localStorage.removeItem("verificationId");
-    // You might also want to persist auth user info here
-    console.log("Verified user:", result.user);
-
-    // Navigate to your desired page after success
-    navigate("/login"); // or "/home"
-  } catch (err) {
-    console.error("OTP verification failed:", err);
-    throw err;
+    alert("🎉 Account created successfully!");
+    navigate("/"); // redirect to homepage or dashboard
+  } catch (error) {
+    console.error("❌ OTP verification failed:", error);
+    alert(error.response?.data?.message || error.message || "OTP verification failed");
   }
-}
+};
+
+export default Verify;

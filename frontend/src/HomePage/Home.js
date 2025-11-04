@@ -10,7 +10,8 @@ import Content6 from "./Content6";
 
 const HomePage = () => {
   return (
-    <Layout>
+    <Layout>     
+
       <Content1 />
       <div className="mt-10">
         <Content2 />

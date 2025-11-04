@@ -18,60 +18,79 @@ const amazon = {
   ]
 };
 
-const CategoryDropdown = () => {
+const CategoryDropdown = ({ onSearch }) => {
   const [showCategories, setShowCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const toggleCategories = () => setShowCategories(prev => !prev);
 
   const handleSelect = (category) => {
     setSelectedCategory(category);
     setShowCategories(false);
+    onSearch?.(category, searchTerm);
+  };
+
+  const handleInputChange = (e) => setSearchTerm(e.target.value);
+
+  const handleSearch = () => {
+    onSearch?.(selectedCategory, searchTerm);
   };
 
   return (
     <div className="relative w-full max-w-3xl">
-      {/* Wrap with border + focus-within to highlight entire group */}
-<div className="flex w-full h-10 overflow-hidden rounded-lg shadow-sm border-4 border-transparent focus-within:border-orange-900 transition duration-200">
-        
-        {/* Left: Category dropdown trigger */}
+      <div className="flex w-full h-11 overflow-hidden rounded-lg shadow-md border-4 border-transparent focus-within:border-orange-500 transition duration-150 bg-white">
+        {/* Category button */}
         <div
-          className="flex items-center gap-1 px-3 bg-gray-200 text-gray-700 text-sm cursor-pointer hover:bg-gray-300"
+          className="flex items-center gap-1 px-4 bg-gray-200 text-gray-700 text-sm font-semibold cursor-pointer hover:bg-gray-300 select-none rounded-l-lg"
           onClick={toggleCategories}
         >
           <span>{selectedCategory}</span>
           <FaChevronDown className="text-xs mt-0.5" />
         </div>
 
-        {/* Middle: Search input */}
+        {/* Search input */}
         <input
           type="text"
           placeholder="Search for products..."
-          className="flex-1 px-4 outline-none text-sm text-gray-700 bg-white"
+          className="flex-1 px-4 outline-none text-sm text-gray-800 bg-white"
+          value={searchTerm}
+          onChange={handleInputChange}
         />
 
-        {/* Right: Search icon */}
-        <div className="flex items-center justify-center bg-orange-300 px-3 cursor-pointer">
+        {/* Search button */}
+        <div
+          className="flex items-center justify-center bg-orange-400 px-4 cursor-pointer hover:bg-orange-500 rounded-r-lg"
+          onClick={handleSearch}
+        >
           <CiSearch className="text-white text-xl" />
         </div>
       </div>
 
-      {/* Dropdown list */}
+      {/* Dropdown menu */}
       {showCategories && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 shadow-md rounded-sm z-10 w-40 max-h-60 overflow-y-auto">
-          <ul className="text-sm text-gray-700">
-            {amazon.search.map((category, index) => (
-              <li
-                key={index}
-                onClick={() => handleSelect(category)}
-                className="px-4 py-2 hover:bg-blue-500 hover:text-white cursor-pointer"
-              >
-                {category}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+  <>
+    {/* Overlay prevents any clicks in page while dropdown is open */}
+    <div className="fixed inset-0 bg-transparent z-[999]" onClick={() => setShowCategories(false)} />
+    <div
+      className="absolute top-full left-0 mt-2 w-44 max-h-72 overflow-y-auto bg-white border border-gray-200 shadow-lg rounded-lg z-[1000]"
+      style={{ background: "white" }}
+      onClick={e => e.stopPropagation()}
+    >
+      <ul className="text-sm font-medium text-gray-700">
+        {amazon.search.map((category, index) => (
+          <li
+            key={index}
+            onClick={() => handleSelect(category)}
+            className="px-4 py-2 hover:bg-orange-500 hover:text-white cursor-pointer transition"
+          >
+            {category}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </>
+)}
     </div>
   );
 };

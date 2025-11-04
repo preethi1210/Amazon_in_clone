@@ -7,7 +7,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS, // App password if Gmail
   },
 });
-
 const sendEmailOTP = async (email, otp) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -15,7 +14,6 @@ const sendEmailOTP = async (email, otp) => {
     subject: 'Your OTP Code',
     text: `Your verification code is ${otp}`
   };
-
   await transporter.sendMail(mailOptions);
 };
 

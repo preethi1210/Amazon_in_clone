@@ -1,109 +1,97 @@
+// controllers/authController.js
 import User from "../model/user.js";
 import generateToken from "../utils/generateToken.js";
-import Otp from "../model/Otp.js";
-import sendEmailOTP from "../utils/sendOTP.js";
 
-// ✅ Email + Password Login/Register
-export const emailAuth = async (req, res) => {
-  const { name, email, password } = req.body;
+// ✅ Register (supports email or phone)
+export const registerUser = async (req, res) => {
+  const { name, email, phone, password } = req.body;
 
   try {
-    let user = await User.findOne({ email });
-
-    if (user) {
-      // login
-      const isMatch = await user.matchPassword(password);
-      if (!isMatch) return res.status(401).json({ message: "Invalid password" });
-
-      return res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        token: generateToken(user._id),
-        message: "Login successful",
-      });
-    } else {
-      // register
-      user = await User.create({ name, email, password });
-
-      return res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        token: generateToken(user._id),
-        message: "User registered successfully",
-      });
-    }
-  } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-};
-
-// ✅ Phone OTP Login/Register
-export const phoneAuth = async (req, res) => {
-  const { uid, phoneNumber, name, email } = req.body;
-
-  try {
-    let user = await User.findOne({ phoneNumber });
-
-    if (!user) {
-      user = await User.create({
-        uid,
-        phoneNumber,
-        name: name || "",
-        email,
-      });
+    // At least one of email or phone required
+    if (!email && !phone) {
+      return res.status(400).json({ message: "Email or phone number required" });
     }
 
-    // ✅ return ensures only ONE response is sent
-    return res.json({
+    // Check if already exists (email or phone)
+    let existingUser = await User.findOne({
+      $or: [{ email }, { phone }]
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // Create new user
+    const user = await User.create({ name, email, phone, password });
+
+    res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
-      phoneNumber: user.phoneNumber,
+      phone: user.phone,
       token: generateToken(user._id),
-      message: "Phone login successful",
+      message: "User registered successfully",
     });
   } catch (err) {
-    console.error("Phone auth error:", err.message);
-    return res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
-// ✅ Send OTP to Email
-export const sendOtpToEmail = async (req, res) => {
+// ✅ Login (by email or phone)
+export const loginUser = async (req, res) => {
+  const { email, phone, password } = req.body;
+
   try {
-    const { email } = req.body;
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // Find by email OR phone
+    const user = await User.findOne({
+      $or: [{ email }, { phone }]
+    });
 
-    await Otp.deleteMany({ email });
-    await new Otp({ email, otp }).save();
-
-    await sendEmailOTP(email, otp);
-    res.json({ message: "OTP sent to email" });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to send OTP", error: err.message });
-  }
-};
-
-// ✅ Verify OTP (for email)
-export const verifyEmailOtp = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    const record = await Otp.findOne({ email, otp });
-
-    if (!record) return res.status(400).json({ message: "Invalid or expired OTP" });
-
-    let user = await User.findOne({ email });
-    if (user) {
-      user.isVerified = true;
-      await user.save();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ message: "Email verified successfully" });
+    // Check password
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      token: generateToken(user._id),
+      message: "Login successful",
+    });
   } catch (err) {
-    res.status(500).json({ message: "OTP verification failed", error: err.message });
+    res.status(500).json({ message: err.message });
+  }
+};
+// ✅ Check if user exists by email or phone
+export const checkUserExists = async (req, res) => {
+  try {
+    const { email, phone } = req.query;
+    if (!email && !phone)
+      return res.status(400).json({ message: "Email or phone required" });
+
+    const query = email ? { email } : { phone };
+    const user = await User.findOne(query);
+
+    if (user) {
+      res.json({
+        exists: true,
+        name: user.name,
+        message: "User already exists",
+      });
+    } else {
+      res.json({
+        exists: false,
+        message: "User not found",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

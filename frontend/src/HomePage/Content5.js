@@ -7,10 +7,12 @@ import oneplus from "./images/1plus.jpg";
 import s24 from "./images/s24.jpg";
 import iq13 from "./images/iq13.jpg";
 import iPhone15 from "./images/iPhone15.jpg";
+import { useNavigate } from "react-router-dom";
 
 const Content5 = () => {
   // Define the image sources array
   const items = [iphone16, vivo, mi7, xi14, oneplus, s24, iq13, iPhone15];
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -20,7 +22,9 @@ const Content5 = () => {
           <h2 className="text-lg font-bold text-gray-800">
             Up to 40% off | Best flagship phones on sale
           </h2>
-          <h5 className="text-blue-600 cursor-pointer hover:underline text-sm">
+          <h5 
+        className="text-blue-600 text-sm mt-3 text-right cursor-pointer hover:underline"
+        onClick={() => navigate("/products/mobile")}>
             Explore more
           </h5>
         </div>

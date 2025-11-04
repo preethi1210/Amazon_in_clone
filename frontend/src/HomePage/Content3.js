@@ -12,14 +12,16 @@ import iron_hang from "./images/iron_hang.jpg";
 import clock from "./images/clock.jpg";
 import indstove from "./images/indstove.jpg";
 import serums from "./images/Serums.jpg";
+import { useNavigate } from "react-router-dom";
 
 const items = [
   fan, dryer, wt_machine, mosquito_bat, odomos,
   toaster, socks, fridge_utility, brick_poster,
   iron_hang, clock, indstove, serums
 ];
-
 const Content3 = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="p-4 bg-white rounded shadow mx-6">
       {/* Heading */}
@@ -27,7 +29,11 @@ const Content3 = () => {
         <h2 className="text-lg font-bold text-gray-800">
           Minimum 50% off | Home, kitchen & outdoors
         </h2>
-        <h5 className="text-blue-600 cursor-pointer hover:underline text-sm">
+        <h5 
+  className="text-blue-600 text-sm mt-3 text-right cursor-pointer hover:underline"
+  onClick={() => navigate("/products/Home")}
+>
+
           See all offers
         </h5>
       </div>

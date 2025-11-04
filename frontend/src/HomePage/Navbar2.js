@@ -1,63 +1,73 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { HiOutlineBars3 } from 'react-icons/hi2';
-import { FaChevronDown } from 'react-icons/fa';
-import { FaUser } from 'react-icons/fa';
-import suprise from './images/suprise.avif';
-import amazonblue from './images/amazon_blue.png';
-import All_categories from './Sub_home/All_categories';
+import React, { useState, useRef, useEffect } from "react";
+import { HiOutlineBars3 } from "react-icons/hi2";
+import { FaChevronDown } from "react-icons/fa";
+import suprise from "./images/suprise.avif";
+import amazonblue from "./images/amazon_blue.png";
+import All_categories from "./Sub_home/All_categories";
+import { useNavigate, Link } from "react-router-dom";
 
 const navItemClass =
-  'border border-transparent hover:border-white px-2 py-1 rounded cursor-pointer whitespace-nowrap';
+  "border border-transparent hover:border-white px-2 py-1 rounded cursor-pointer whitespace-nowrap";
 
 const Navbar2 = () => {
   const [showPrimeDropdown, setShowPrimeDropdown] = useState(false);
   const [showAllDropdown, setShowAllDropdown] = useState(false);
   const allDropdownRef = useRef(null);
   const primeTimeoutRef = useRef(null);
+  const [userName, setUserName] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const name = localStorage.getItem("userName");
+    setUserName(name || "");
+  }, []);
 
   // Handle click outside for All dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        allDropdownRef.current &&
-        !allDropdownRef.current.contains(event.target)
-      ) {
+      if (allDropdownRef.current && !allDropdownRef.current.contains(event.target)) {
         setShowAllDropdown(false);
       }
     };
 
     if (showAllDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     } else {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showAllDropdown]);
 
-  // Handle Prime Hover
+  // Prime hover
   const handlePrimeEnter = () => {
     clearTimeout(primeTimeoutRef.current);
     setShowPrimeDropdown(true);
   };
-
   const handlePrimeLeave = () => {
     primeTimeoutRef.current = setTimeout(() => {
       setShowPrimeDropdown(false);
     }, 100);
   };
 
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userIdentifier");
+    localStorage.removeItem("userName");
+    setUserName("");
+    navigate("/login");
+  };
+
   return (
     <div className="bg-gray-800 text-white w-full relative">
       {/* Dark overlay when All dropdown is open */}
-      {showAllDropdown && (
-        <div className="fixed inset-0 bg-black opacity-50 z-40" />
-      )}
+      {showAllDropdown && <div className="fixed inset-0 bg-black opacity-50 z-40" />}
 
       <div className="flex items-center flex-wrap gap-3 text-sm px-4 py-2 relative z-50">
-        {/* All - Click to open dropdown */}
+        {/* All Categories */}
         <div ref={allDropdownRef} className="relative">
           <div
             className={`${navItemClass} flex items-center gap-1`}
@@ -73,13 +83,31 @@ const Navbar2 = () => {
             </div>
           )}
         </div>
+        <Link to="/category/Fashion" className={navItemClass}>Fashion</Link>
+<Link to="/category/Mobiles" className={navItemClass}>Mobiles</Link>
+<Link to="/category/Bestsellers" className={navItemClass}>Bestsellers</Link>
+<Link to="/category/Todays Deals" className={navItemClass}>Today's Deals</Link>
+<Link to="/category/New Releases" className={navItemClass}>New Releases</Link>
+<Link to="/category/Electronics" className={navItemClass}>Electronics</Link>
 
-        <div className={navItemClass}>Sell</div>
-        <div className={navItemClass}>Bestsellers</div>
-        <div className={navItemClass}>Today's Deals</div>
-        <div className={navItemClass}>Mobiles</div>
+        {/* Other Nav Items with Links */}
+        <Link to="/sell" className={navItemClass}>
+          Sell
+        </Link>
+        <Link to="/category/Home & Kitchen" className={navItemClass}>
+          Home & Kitchen
+        </Link>
+        <Link to="/category/Electronics" className={navItemClass}>
+          Electronics
+        </Link>
+        <Link to="/payment" className={navItemClass}>
+          Amazon Pay
+        </Link>
+        <Link to="/category/Computers" className={navItemClass}>
+          Computers
+        </Link>
 
-        {/* Prime - Hover to show dropdown */}
+        {/* Prime Dropdown */}
         <div
           className="relative z-50"
           onMouseEnter={handlePrimeEnter}
@@ -120,13 +148,19 @@ const Navbar2 = () => {
           )}
         </div>
 
-        <div className={navItemClass}>Customer Service</div>
-        <div className={navItemClass}>Fashion</div>
-        <div className={navItemClass}>New Releases</div>
-        <div className={navItemClass}>Home & Kitchen</div>
-        <div className={navItemClass}>Electronics</div>
-        <div className={navItemClass}>Amazon Pay</div>
-        <div className={navItemClass}>Computers</div>
+        {/* User Section */}
+        {userName ? (
+          <button
+            onClick={handleLogout}
+            className="border px-2 py-1 rounded hover:bg-red-600"
+          >
+            Logout ({userName})
+          </button>
+        ) : (
+          <Link to="/login" className={navItemClass}>
+            Login
+          </Link>
+        )}
       </div>
     </div>
   );
