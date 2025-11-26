@@ -32,7 +32,7 @@ const Login = () => {
     }
 
     try {
-      const endpoint = "http://localhost:5000/api/auth/login";
+const endpoint = `${process.env.REACT_APP_API_BASE_URL}/auth/login`;
       const bodyData = isPhone
         ? { phone: identifier, password }
         : { email: identifier, password };
