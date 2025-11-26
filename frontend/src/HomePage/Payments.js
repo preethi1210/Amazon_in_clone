@@ -27,7 +27,7 @@ const Payment = () => {
     try {
       // 1️⃣ Create Razorpay order in backend
       const { data: razorOrder } = await axios.post(
-        "http://localhost:5000/api/payment/create-order",
+       `${process.env.REACT_APP_API_BASE_URL}/payment/create-order`,
         { amount: totalPrice * 100 },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -45,7 +45,7 @@ const Payment = () => {
           try {
             // 2️⃣ Save order in backend
             await axios.post(
-              "http://localhost:5000/api/orders/create",
+                     `${process.env.REACT_APP_API_BASE_URL}/orders/create`,
               { items: itemsToPay, amount: totalPrice },
               { headers: { Authorization: `Bearer ${token}` } }
             );
