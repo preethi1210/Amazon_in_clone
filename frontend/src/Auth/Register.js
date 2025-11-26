@@ -27,7 +27,10 @@ const Register = () => {
       setLoading(true);
 
       // 1️⃣ Check if phone already registered
-      const { data } = await axios.post("http://localhost:5000/api/auth/check-phone", {
+const { data } = await axios.post(
+  `${process.env.REACT_APP_API_BASE_URL}/auth/check-phone`,
+  { phone: phoneNumber }
+);
         phone: mobileNumber,
       });
       
