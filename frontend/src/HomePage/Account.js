@@ -22,9 +22,13 @@ const Account = () => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
-        const { data } = await axios.get("http://localhost:5000/api/user/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+const { data } = await axios.get(
+  `${process.env.REACT_APP_API_BASE_URL}/user/profile`,
+  {
+    headers: { Authorization: `Bearer ${token}` },
+  }
+);
+
 
         setUser({
           name: data.name,
@@ -59,11 +63,14 @@ const Account = () => {
     const saveDetails = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
-        "http://localhost:5000/api/user/profile",
-        { ...user },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+await axios.put(
+  `${process.env.REACT_APP_API_BASE_URL}/user/profile`,
+  { ...user },
+  {
+    headers: { Authorization: `Bearer ${token}` },
+  }
+);
+
       alert("User details updated!");
       setIsEditing(false);
     } catch (err) {
