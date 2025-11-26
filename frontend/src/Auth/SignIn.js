@@ -21,10 +21,10 @@ const SignIn = () => {
       const queryParam = isPhone ? `phone=${input}` : `email=${input}`;
 
       // ✅ Adjust API route to your backend format
-      const res = await fetch(
-        `http://localhost:5000/api/auth/user-exists?${queryParam}`,
-        { method: "GET", credentials: "include" }
-      );
+const res = await fetch(
+  `${process.env.REACT_APP_API_BASE_URL}/auth/user-exists?${queryParam}`,
+  { method: "GET", credentials: "include" }
+);
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Server error");
