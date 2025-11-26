@@ -10,7 +10,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/user/profile", {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/user/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -26,7 +26,7 @@ const Profile = () => {
 
   const handleUpdate = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/user/profile", {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/user/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
