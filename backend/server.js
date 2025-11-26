@@ -20,8 +20,9 @@ import orderRoutes from "./routes/order.js";
 import paymentsRoutes from "./routes/payment.js";
 
 const app = express();
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors({ origin: FRONTEND_URL, credentials: true }));
 app.use(express.json());
 
 // MongoDB connection
