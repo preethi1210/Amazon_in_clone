@@ -20,9 +20,8 @@ import orderRoutes from "./routes/order.js";
 import paymentsRoutes from "./routes/payment.js";
 
 const app = express();
-console.log("✅ Loaded MONGO_URI:", process.env.MONGO_URI);
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 
 // MongoDB connection
@@ -37,7 +36,15 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentsRoutes);
 app.use("/api/customer-service", customerServiceRoutes);
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client/build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
