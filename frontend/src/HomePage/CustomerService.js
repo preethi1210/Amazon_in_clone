@@ -8,7 +8,8 @@ const CustomerService = () => {
   useEffect(() => {
     const fetchInfo = async () => {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get("http://localhost:5000/api/customer-service", {
+      const { data } = await axios.get(  `${process.env.REACT_APP_API_BASE_URL}/customer-service`,
+ {
         headers: { Authorization: `Bearer ${token}` },
       });
       setInfo(data);
@@ -24,7 +25,7 @@ const CustomerService = () => {
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.post(
-        "http://localhost:5000/api/customer-service/contact",
+  `${process.env.REACT_APP_API_BASE_URL}/customer-service/contact`,
         form,
         { headers: { Authorization: `Bearer ${token}` } }
       );
