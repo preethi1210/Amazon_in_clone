@@ -33,7 +33,7 @@ const ProductsPage = () => {
   const fetchProducts = async (cat = "All categories", search = "") => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/products");
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
       const data = await res.json();
 
       const filtered = data.filter((p) => {
