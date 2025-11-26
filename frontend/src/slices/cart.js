@@ -4,7 +4,7 @@ import axios from "axios";
 // Fetch cart
 export const fetchCart = createAsyncThunk("cart/fetch", async () => {
   const token = localStorage.getItem("token");
-  const res = await axios.get("http://localhost:5000/api/cart", {
+  const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/cart`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data; // { userId, items: [...] }
@@ -16,7 +16,7 @@ export const addToCart = createAsyncThunk(
   async ({ productId, quantity }) => {
     const token = localStorage.getItem("token");
     const { data } = await axios.post(
-      "http://localhost:5000/api/cart/add",
+      `${process.env.REACT_APP_API_BASE_URL}/cart/add`,
       { productId, quantity },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -28,7 +28,7 @@ export const addToCart = createAsyncThunk(
 export const updateCart = createAsyncThunk("cart/update", async ({ productId, quantity }) => {
   const token = localStorage.getItem("token");
   const { data } = await axios.put(
-    "http://localhost:5000/api/cart/update",
+    `${process.env.REACT_APP_API_BASE_URL}/cart/update`,
     { productId, quantity },
     { headers: { Authorization: `Bearer ${token}` } }
   );
@@ -40,7 +40,7 @@ export const removeFromCart = createAsyncThunk(
   async (productId) => {
     const token = localStorage.getItem("token");
     const { data } = await axios.delete(
-      `http://localhost:5000/api/cart/remove/${productId}`,
+      `${process.env.REACT_APP_API_BASE_URL}/cart/remove/${productId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     return data; // return updated cart { userId, items: [...] }
