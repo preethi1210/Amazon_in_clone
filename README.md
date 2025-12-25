@@ -70,5 +70,6 @@ MERN stack Amazon-like e-commerce application
 * Always rotate credentials if `.env` is exposed
 
 ---
+backend deployment url : https://amazon-in-clone.onrender.com/
 
 This is a concise version highlighting the essential setup and features for quick reference.
