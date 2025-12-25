@@ -39,6 +39,12 @@ app.use("/api/payment", paymentsRoutes);
 app.use("/api/customer-service", customerServiceRoutes);
 
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Backend API is running ",
+  });
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;
