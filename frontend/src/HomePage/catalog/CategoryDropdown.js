@@ -53,7 +53,7 @@ const CategoryDropdown = ({ onSearch }) => {
       </div>
 
       {showCategories && (
-        <div className="absolute top-full left-0 mt-1 w-full bg-white border shadow-lg z-50">
+        <div className="absolute top-full left-0 mt-1 w-full bg-white text-gray-900 border shadow-lg z-50">
           {categories.map((cat) => (
             <div
               key={cat}
