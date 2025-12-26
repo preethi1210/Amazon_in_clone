@@ -13,26 +13,26 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const formatPhone = (val) => {
+    let digits = val.replace(/\D/g, "");
+    if (digits.length === 10) digits = "+91" + digits;
+    else if (!digits.startsWith("+")) digits = "+" + digits;
+    setMobileNumber(digits);
+  };
+
   const handleVerifyMobile = async () => {
     if (!name || !mobileNumber || !password) {
       alert("Please fill all fields");
-      return;
-    }
-    if (!mobileNumber.startsWith("+")) {
-      alert("Phone must be in international format, e.g. +91XXXXXXXXXX");
       return;
     }
 
     try {
       setLoading(true);
 
-      // 1️⃣ Check if phone already registered
-const { data } = await axios.post(
-  `${process.env.REACT_APP_API_BASE_URL}/auth/check-phone`,
-  { 
-        phone: mobileNumber,
-      });
-      
+      const { data } = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/auth/check-phone`,
+        { phone: mobileNumber }
+      );
 
       if (data.exists) {
         alert("Phone already registered. Redirecting to login...");
@@ -40,19 +40,15 @@ const { data } = await axios.post(
         return;
       }
 
-      // 2️⃣ Send OTP via Firebase
       const otpResult = await sendOtp(mobileNumber);
-      if (!otpResult) {
-        throw new Error("Failed to send OTP. Check Firebase setup.");
-      }
+      if (!otpResult) throw new Error("Failed to send OTP.");
 
-      // 3️⃣ Temporarily save registration data
       localStorage.setItem("name", name);
       localStorage.setItem("phoneNumber", mobileNumber);
       localStorage.setItem("password", password);
 
       alert("OTP sent successfully!");
-      navigate("/auth-req"); // move to verification screen
+      navigate("/auth-req");
     } catch (err) {
       console.error("Error sending OTP:", err);
       alert("Failed: " + (err?.message || "Unknown error"));
@@ -63,9 +59,6 @@ const { data } = await axios.post(
 
   return (
     <div className="flex flex-col items-center mt-20">
-      {/* 🔹 Must exist for Firebase Recaptcha */}
-      <div id="recaptcha-container"></div>
-
       <img src={amazonLogo} alt="Amazon" className="w-20 mb-5" />
 
       <div className="border border-gray-400 p-6 w-[350px] rounded bg-white">
@@ -82,7 +75,7 @@ const { data } = await axios.post(
         <PhoneInput
           country="in"
           value={mobileNumber}
-          onChange={(val) => setMobileNumber(val.startsWith("+") ? val : "+" + val)}
+          onChange={(val) => formatPhone(val)}
           inputStyle={{ width: "100%" }}
           containerStyle={{ marginBottom: "10px" }}
         />
@@ -99,9 +92,7 @@ const { data } = await axios.post(
           onClick={handleVerifyMobile}
           disabled={loading}
           className={`${
-            loading
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-yellow-400 hover:bg-yellow-300"
+            loading ? "bg-gray-300 cursor-not-allowed" : "bg-yellow-400 hover:bg-yellow-300"
           } py-2 px-4 rounded w-full`}
         >
           {loading ? "Sending…" : "Verify mobile number"}
