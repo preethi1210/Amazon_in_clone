@@ -37,13 +37,14 @@ function Product({ _id, title, image, price, rating }) {
           <span className="text-sm">₹</span>
           {price}
         </p>
-        <div className="flex justify-center mt-1">
-          {Array(rating)
-            .fill()
-            .map((_, i) => (
-              <span key={i}>🌟</span>
-            ))}
-        </div>
+<div className="flex justify-center mt-1">
+  {Array(Math.max(0, Math.round(rating || 0)))
+    .fill()
+    .map((_, i) => (
+      <span key={i}>🌟</span>
+    ))}
+</div>
+
       </div>
 
       <img className="w-full h-48 object-contain mb-4" src={image} alt={title} />
