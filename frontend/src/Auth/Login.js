@@ -44,6 +44,7 @@ const endpoint = `${process.env.REACT_APP_API_BASE_URL}/auth/login`;
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
       });
+console.log("Login payload:", bodyData);
 
       const data = await res.json();
 
