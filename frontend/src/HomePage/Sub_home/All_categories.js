@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { FaUser } from "react-icons/fa";
-import {
-  SlArrowRight,
-  SlArrowDown,
-  SlArrowUp,
-  SlArrowLeft,
-} from "react-icons/sl";
 import { Link } from "react-router-dom";
+import { FaUser } from "react-icons/fa";
+import { SlArrowRight, SlArrowLeft, SlArrowUp, SlArrowDown } from "react-icons/sl";
 
 const All_categories = () => {
-  const [showPrograms, setShowPrograms] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [subMenuPage, setSubMenuPage] = useState(null);
   const [userName, setUserName] = useState("");
@@ -19,12 +13,8 @@ const All_categories = () => {
     setUserName(name || "");
   }, []);
 
-  const togglePrograms = () => setShowPrograms(!showPrograms);
-  const toggleCategories = () => setShowCategories(!showCategories);
-
-  const toggleSubMenu = (item) => {
-    setSubMenuPage((prev) => (prev === item ? null : item));
-  };
+  const toggleSubMenu = (item) => setSubMenuPage(prev => (prev === item ? null : item));
+  const toggleCategories = () => setShowCategories(prev => !prev);
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -35,109 +25,23 @@ const All_categories = () => {
 
   const goBackToMain = () => setSubMenuPage(null);
 
-  // Submenu items for each main category
+  // Submenu items mapping
   const subMenus = {
-    "Mobiles, Computers": [
-      "All Mobile Phones",
-      "Laptops",
-      "Tablets",
-      "Accessories",
-      "Power Banks",
-      "Smart Home",
-    ],
-    "TV, Appliances, Electronics": [
-      "Televisions",
-      "Headphones",
-      "Cameras",
-      "Appliances",
-      "Air Conditioners",
-      "Refrigerators",
-      "Washing Machines",
-    ],
-    "Men's Fashion": [
-      "Shirts",
-      "Jeans",
-      "Shoes",
-      "T-shirts",
-      "Watches",
-      "Bags & Luggage",
-    ],
-    "Women's Fashion": [
-      "Clothing",
-      "Handbags",
-      "Jewellery",
-      "Shoes",
-      "Accessories",
-      "Western Wear",
-    ],
-    "Echo & Alexa": [
-      "See all devices with Alexa",
-      "Meet Alexa",
-      "Alexa Skills",
-      "Alexa App",
-      "Alexa Smart Home",
-      "Amazon Prime Music",
-    ],
-    "Fire TV": ["Amazon Prime Video", "Fire TV Apps & Games", "See all Fire TV devices"],
-    "Kindle E-Readers": [
-      "All-new Kindle",
-      "All-new Kindle Paperwhite",
-      "Kindle Paperwhite Starter Pack",
-      "All-New Kindle Oasis",
-      "Refurbished & Open Box",
-      "Kindle E-Reader Accessories",
-      "Kindle eBooks",
-      "Prime Reading",
-    ],
-    "Audible Audiobooks": ["Audible Membership", "All Audiobooks", "Best Sellers"],
-    "Amazon Prime Video": ["All Videos", "Categories", "My Stuff"],
-    "Amazon Prime Music": ["Amazon Prime Music", "Open web player", "Voice controlled with Alexa"],
-    "Gift Cards": [
-      "All Gift Cards",
-      "Popular Gift Cards",
-      "Gift Boxes & Tags",
-      "Birthday Gift Cards",
-      "Corporate Gift Cards",
-      "Mobile Recharges",
-    ],
-    "Programs & Features": [
-      "Handloom and Handicrafts",
-      "Amazon Saheli",
-      "Amazon Custom",
-      "Flight Tickets",
-      "Buy More, Save More",
-      "Clearance Store",
-      "International Brands",
-    ],
+    "Mobiles, Computers": ["All Mobile Phones", "Laptops", "Tablets", "Accessories", "Power Banks"],
+    "TV, Appliances, Electronics": ["Televisions", "Headphones", "Refrigerators", "Washing Machines", "Cameras"],
+    "Men's Fashion": ["Shirts", "Jeans", "Shoes", "T-shirts", "Watches"],
+    "Women's Fashion": ["Clothing", "Handbags", "Jewellery", "Shoes", "Accessories"],
   };
 
-  // Main categories
-  const mainCategories = [
-    "Mobiles, Computers",
-    "TV, Appliances, Electronics",
-    "Men's Fashion",
-    "Women's Fashion",
-    "Echo & Alexa",
-    "Fire TV",
-    "Kindle E-Readers",
-    "Audible Audiobooks",
-    "Amazon Prime Video",
-    "Amazon Prime Music",
-    "Gift Cards",
-  ];
+  const mainCategories = Object.keys(subMenus);
 
-  // Other categories under "See more"
   const otherCategories = [
     "Home, Kitchen, Pets",
     "Beauty, Health, Grocery",
     "Sports, Fitness, Bags, Luggage",
     "Toys, Baby Products, Kids' Fashion",
-    "Car, Motorbike, Industrial",
     "Books",
     "Movies, Music & Video Games",
-    "Amazon Pay",
-    "Amazon Launchpad",
-    "Amazon Business",
   ];
 
   // Render submenu page
@@ -147,15 +51,15 @@ const All_categories = () => {
         onClick={goBackToMain}
         className="flex items-center text-black mb-2 text-lg w-full"
       >
-        <SlArrowLeft className="mr-2 text-lg" /> Back to Menu
+        <SlArrowLeft className="mr-2" /> Back to Menu
       </button>
       <h4 className="font-bold text-lg mb-3">{item}</h4>
-      <ul className="space-y-2 text-black">
-        {subMenus[item]?.map((subItem) => (
-          <li key={subItem}>
+      <ul className="space-y-2">
+        {subMenus[item].map((subItem) => (
+          <li key={subItem} className="hover:underline">
             <Link
-              to={`/category/${encodeURIComponent(subItem)}`}
-              className="text-blue-600 hover:underline"
+              to={`/category/${encodeURIComponent(subItem)}`} // ✅ link points to ProductsPage
+              className="text-blue-600"
             >
               {subItem}
             </Link>
@@ -168,73 +72,52 @@ const All_categories = () => {
   if (subMenuPage) return renderSubMenu(subMenuPage);
 
   return (
-    <div className="w-80 bg-white text-black text-sm max-h-[80vh] overflow-y-auto">
-      {/* User section */}
-      <div className="bg-blue-950 text-white p-3">
-        <div className="flex items-center gap-3 p-2">
-          <FaUser className="text-2xl" />
-          <h3 className="font-bold text-xl">
-            {userName ? `Hello, ${userName}` : "Hello, sign in"}
-          </h3>
-        </div>
+    <div className="w-80 bg-white max-h-[80vh] overflow-y-auto text-black text-sm">
+      <div className="bg-blue-950 text-white p-3 flex items-center gap-2">
+        <FaUser className="text-2xl" />
+        <span className="font-bold">{userName ? `Hello, ${userName}` : "Hello, sign in"}</span>
       </div>
 
       <div className="p-4">
-        {/* Main Categories */}
-        <div>
-          <h4 className="font-bold mb-3">Shop by Category</h4>
-          <ul className="space-y-2">
-            {mainCategories.map((item) => (
-              <li
-                key={item}
-                className="flex justify-between items-center cursor-pointer hover:bg-gray-100 p-1 rounded"
-                onClick={() => toggleSubMenu(item)}
-              >
-                <span>{item}</span>
-                <SlArrowRight />
+        <h4 className="font-bold mb-3">Shop by Category</h4>
+        <ul className="space-y-2">
+          {mainCategories.map((item) => (
+            <li
+              key={item}
+              className="flex justify-between items-center cursor-pointer hover:bg-gray-100 p-1 rounded"
+              onClick={() => toggleSubMenu(item)}
+            >
+              <span>{item}</span>
+              <SlArrowRight />
+            </li>
+          ))}
+
+          <li
+            className="flex justify-between items-center cursor-pointer hover:bg-gray-100 p-1 rounded"
+            onClick={toggleCategories}
+          >
+            {showCategories ? "See less" : "See more"}{" "}
+            {showCategories ? <SlArrowUp /> : <SlArrowDown />}
+          </li>
+
+          {showCategories &&
+            otherCategories.map((item) => (
+              <li key={item} className="ml-4 p-1 hover:bg-gray-100 rounded">
+                <Link
+                  to={`/category/${encodeURIComponent(item)}`} // ✅ link points to ProductsPage
+                  className="text-blue-600 hover:underline"
+                >
+                  {item}
+                </Link>
               </li>
             ))}
+        </ul>
 
-            {/* See more toggle */}
-            <li
-              className="flex justify-between items-center cursor-pointer hover:bg-gray-100 p-1 rounded"
-              onClick={toggleCategories}
-            >
-              {showCategories ? "See less" : "See more"}{" "}
-              {showCategories ? <SlArrowUp /> : <SlArrowDown />}
-            </li>
+        <hr className="border-t my-4" />
 
-            {/* Other Categories */}
-            {showCategories &&
-              otherCategories.map((item) => (
-                <li key={item} className="ml-4 p-1 hover:bg-gray-100 rounded">
-                  <Link
-                    to={`/category/${encodeURIComponent(item)}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-          </ul>
-        </div>
-
-        <hr className="border-t border-gray-300 my-4" />
-
-        {/* Help & Settings */}
         <div>
-          <h4 className="font-bold mb-3">Help & Settings</h4>
+          <h4 className="font-bold mb-2">Help & Settings</h4>
           <ul className="space-y-2">
-            <li>
-              <Link to="/account" className="hover:underline text-blue-600">
-                Your Account
-              </Link>
-            </li>
-            <li>
-              <Link to="/customer-service" className="hover:underline text-blue-600">
-                Customer Service
-              </Link>
-            </li>
             {userName ? (
               <li>
                 <button
