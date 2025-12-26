@@ -33,6 +33,8 @@ const Login = () => {
 
     try {
 const endpoint = `${process.env.REACT_APP_API_BASE_URL}/auth/login`;
+      console.log("API base URL:", process.env.REACT_APP_API_BASE_URL);
+
       const bodyData = isPhone
         ? { phone: identifier, password }
         : { email: identifier, password };
