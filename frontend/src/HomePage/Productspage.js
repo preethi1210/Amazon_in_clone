@@ -24,36 +24,26 @@ const ProductsPage = () => {
 
   const normalize = (str) => (str || "").toLowerCase().trim();
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
-      if (!res.ok) throw new Error("Failed to fetch products");
-      const data = await res.json();
+const fetchProducts = async () => {
+  setLoading(true);
+  try {
+    const url = new URL(`${process.env.REACT_APP_API_BASE_URL}/products`);
+    
+    if (categoryName) url.searchParams.append("category", categoryName);
+    if (searchTerm) url.searchParams.append("q", searchTerm);
 
-      const finalCategory = categoryName || "All categories";
-      const mappedCategories = categoryMap[finalCategory] || [normalize(finalCategory)];
-      const searchWords = searchTerm.toLowerCase().split(" ").filter(Boolean);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Failed to fetch products");
 
-      const filtered = data.filter((p) => {
-        const productCategories = (p.category || "")
-          .split(",")
-          .map(normalize);
-
-        const categoryMatch =
-          finalCategory.toLowerCase() === "all categories" ||
-          productCategories.some((pc) => mappedCategories.includes(pc));
-
-        const titleLower = (p.title || "").toLowerCase();
-        const searchMatch =
-          searchWords.length === 0 ||
-          searchWords.every((word) => titleLower.includes(word));
-
-        return categoryMatch && searchMatch;
-      });
-
-      setProducts(filtered);
-    } catch (err) {
+    const data = await res.json();
+    setProducts(data);
+  } catch (err) {
+    console.error(err);
+    setProducts([]);
+  } finally {
+    setLoading(false);
+  }
+ catch (err) {
       console.error(err);
       setProducts([]);
     } finally {
