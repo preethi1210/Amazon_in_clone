@@ -14,36 +14,45 @@ const ProductsPage = () => {
   const pathParams = useParams();
   const pathCategory = pathParams.categoryName || "";
 
+  // Final category to filter
   const category = pathCategory || queryCategory || "All";
 
   const fetchProducts = async (cat = "All", search = "") => {
     setLoading(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
+      if (!res.ok) throw new Error("Failed to fetch products");
+
       const data = await res.json();
       console.log("All products from API:", data);
 
+      // Normalize search terms
+      const searchWords = search
+        .toLowerCase()
+        .trim()
+        .split(" ")
+        .filter(Boolean);
+
+      // Filter products
       const filtered = data.filter((p) => {
         const productCategories = (p.category || "")
-          .split(",")
+          .split(",") // split if multiple categories
           .map((c) => c.toLowerCase().trim());
 
         const categoryMatch =
           cat.toLowerCase() === "all" || productCategories.includes(cat.toLowerCase().trim());
 
-        const searchWords = search
-          .toLowerCase()
-          .trim()
-          .split(" ")
-          .filter(Boolean);
+        const titleLower = (p.title || "").toLowerCase();
 
+        // Match if all search words appear somewhere in the title
         const searchMatch =
           searchWords.length === 0 ||
-          searchWords.every((word) => p.title.toLowerCase().includes(word));
+          searchWords.every((word) => titleLower.includes(word));
 
         return categoryMatch && searchMatch;
       });
 
+      console.log("Filtered products:", filtered);
       setProducts(filtered);
     } catch (err) {
       console.error("Error fetching products:", err);
