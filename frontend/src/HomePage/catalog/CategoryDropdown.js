@@ -45,7 +45,7 @@ const CategoryDropdown = ({ onSearch }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <button
-          className="bg-orange-500 px-3 hover:bg-orange-600 text-white"
+          className="bg-orange-500 px-3 hover:bg-orange-600 text-black"
           onClick={handleSearch}
         >
           <CiSearch />
