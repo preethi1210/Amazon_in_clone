@@ -39,7 +39,7 @@ app.use("/api/payment", paymentsRoutes);
 app.use("/api/customer-service", customerServiceRoutes);
 
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.status(200).json({
     success: true,
     message: "Backend API is running ",
