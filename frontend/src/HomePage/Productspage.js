@@ -48,31 +48,32 @@ const filtered = data.filter((p) => {
     .split(",")
     .map((c) => c.toLowerCase().trim());
 
-  // Map category
   const mappedCategories = categoryMap[cat] || [cat.toLowerCase()];
 
+  // categoryMatch: any of the mapped categories appear in product
   const categoryMatch =
     cat.toLowerCase() === "all" ||
-  (p.category || "").toLowerCase().includes(cat.toLowerCase());
+    mappedCategories.some((mc) => productCategories.includes(mc));
 
   const titleLower = (p.title || "").toLowerCase();
-  const searchWords = search
+
+  const searchWordsLower = search
     .toLowerCase()
     .trim()
     .split(" ")
     .filter(Boolean);
 
-const searchMatch =
-  searchWords.length === 0 ||
-  searchWords.some((word) => (p.title || "").toLowerCase().includes(word));
-
-
-  return categoryMatch && searchMatch;
-});
+  const searchMatch =
+    searchWordsLower.length === 0 ||
+    searchWordsLower.every((word) => titleLower.includes(word));
 console.log("Product:", p.title, "Category:", p.category);
 console.log("Category:", cat);
 console.log("Search:", search);
 console.log("Filtered products:", filtered);
+  return categoryMatch && searchMatch;
+});
+
+
 
       console.log("Filtered products:", filtered);
       setProducts(filtered);
