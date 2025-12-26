@@ -24,6 +24,14 @@ const Login = () => {
     setIsPhone(/^\+?\d{10,15}$/.test(savedIdentifier));
   }, []);
 
+  const formatPhone = (val) => {
+    let digits = val.replace(/\D/g, "");
+    if (digits.length === 10) digits = "+91" + digits;
+    else if (!digits.startsWith("+")) digits = "+" + digits;
+    setIdentifier(digits);
+    setIsPhone(/^\+\d{10,15}$/.test(digits));
+  };
+
   const signIn = async () => {
     if (!identifier || !password) {
       alert("Please enter both email/phone and password.");
@@ -33,15 +41,9 @@ const Login = () => {
     try {
       const endpoint = `${process.env.REACT_APP_API_BASE_URL}/auth/login`;
 
-      const normalizedPhone = identifier.startsWith("+")
-        ? identifier
-        : "+" + identifier;
-
       const bodyData = isPhone
-        ? { phone: normalizedPhone, password } // ✅ use correct backend key
+        ? { phone: identifier, password } // ✅ correct key
         : { email: identifier, password };
-
-      console.log("Login payload:", bodyData);
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -90,11 +92,7 @@ const Login = () => {
               <PhoneInput
                 country="in"
                 value={identifier}
-                onChange={(value) => {
-                  const val = value.startsWith("+") ? value : "+" + value;
-                  setIdentifier(val);
-                  setIsPhone(/^\+?\d{10,15}$/.test(val));
-                }}
+                onChange={(val) => formatPhone(val)}
                 inputStyle={{ width: "100%" }}
                 countryCodeEditable={false}
               />
@@ -102,15 +100,7 @@ const Login = () => {
               <input
                 type="text"
                 value={identifier}
-                onChange={(e) => {
-                  const val = e.target.value.trim();
-  let formatted = val.replace(/\D/g, ""); // remove non-digits
-  if (formatted.length === 10) formatted = "+91" + formatted;
-  else if (!formatted.startsWith("+")) formatted = "+" + formatted;
-  setIdentifier(formatted);
-  setIsPhone(/^\+\d{10,15}$/.test(formatted));
-
-                }}
+                onChange={(e) => formatPhone(e.target.value)}
                 className="w-full border border-gray-400 px-3 py-2 rounded"
               />
             )}
@@ -125,29 +115,12 @@ const Login = () => {
               className="w-full border border-gray-400 px-3 py-2 rounded"
             />
 
-            <p
-              className="text-blue-500 text-sm mt-1 hover:underline cursor-pointer"
-              onClick={() => navigate("/forgot-password")}
-            >
-              Forgot password?
-            </p>
-
             <button
               onClick={signIn}
               className="bg-yellow-400 hover:bg-yellow-300 py-2 px-4 rounded mt-4 w-full font-semibold"
             >
               Sign in
             </button>
-
-            <p className="text-sm text-gray-700 mt-3">
-              New to Amazon?{" "}
-              <span
-                className="text-yellow-600 cursor-pointer hover:underline"
-                onClick={() => navigate("/register")}
-              >
-                Create your Amazon account
-              </span>
-            </p>
           </>
         )}
       </div>
