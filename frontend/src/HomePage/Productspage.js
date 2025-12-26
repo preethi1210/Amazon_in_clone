@@ -32,25 +32,42 @@ const ProductsPage = () => {
         .trim()
         .split(" ")
         .filter(Boolean);
+const categoryMap = {
+  Fashion: ["men's fashion", "women's fashion"],
+  Mobiles: ["mobile phones", "computers", "mobiles & accessories"],
+  Electronics: ["electronics", "tv, appliances, electronics", "digital content and devices"],
+  Bestsellers: ["bestsellers"],
+  "Todays Deals": ["deals"],
+  "New Releases": ["new"],
+};
+
 
       // Filter products
-      const filtered = data.filter((p) => {
-        const productCategories = (p.category || "")
-          .split(",") // split if multiple categories
-          .map((c) => c.toLowerCase().trim());
+const filtered = data.filter((p) => {
+  const productCategories = (p.category || "")
+    .split(",")
+    .map((c) => c.toLowerCase().trim());
 
-        const categoryMatch =
-          cat.toLowerCase() === "all" || productCategories.includes(cat.toLowerCase().trim());
+  // Map category
+  const mappedCategories = categoryMap[cat] || [cat.toLowerCase()];
 
-        const titleLower = (p.title || "").toLowerCase();
+  const categoryMatch =
+    cat.toLowerCase() === "all" ||
+    mappedCategories.some((mc) => productCategories.includes(mc));
 
-        // Match if all search words appear somewhere in the title
-        const searchMatch =
-          searchWords.length === 0 ||
-          searchWords.every((word) => titleLower.includes(word));
+  const titleLower = (p.title || "").toLowerCase();
+  const searchWords = search
+    .toLowerCase()
+    .trim()
+    .split(" ")
+    .filter(Boolean);
 
-        return categoryMatch && searchMatch;
-      });
+  const searchMatch =
+    searchWords.length === 0 ||
+    searchWords.every((word) => titleLower.includes(word));
+
+  return categoryMatch && searchMatch;
+});
 
       console.log("Filtered products:", filtered);
       setProducts(filtered);
