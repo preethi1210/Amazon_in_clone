@@ -14,10 +14,17 @@ const SignIn = () => {
       return;
     }
 
+    let formattedInput = input.trim();
+
+    // Auto-add +91 for 10-digit numbers
+    if (/^\d{10}$/.test(formattedInput)) {
+      formattedInput = "+91" + formattedInput;
+    }
+
     setLoading(true);
     try {
-      const isPhone = /^\+?\d{10,15}$/.test(input.trim());
-      const queryParam = isPhone ? `phone=${input}` : `email=${input}`;
+      const isPhone = /^\+?\d{10,15}$/.test(formattedInput);
+      const queryParam = isPhone ? `phone=${formattedInput}` : `email=${formattedInput}`;
 
       const res = await fetch(
         `${process.env.REACT_APP_API_BASE_URL}/auth/user-exists?${queryParam}`,
@@ -27,13 +34,13 @@ const SignIn = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Server error");
 
-      localStorage.setItem("userIdentifier", input);
+      localStorage.setItem("userIdentifier", formattedInput);
 
       if (data.exists) {
         localStorage.setItem("userName", data.name || "");
         navigate("/login");
       } else {
-        navigate("/intent");
+        navigate("/intent"); // move to Step2/register
       }
     } catch (err) {
       console.error("Error checking user:", err);
@@ -87,36 +94,7 @@ const SignIn = () => {
           </Link>
           .
         </p>
-
-        <hr className="my-4 border-gray-300" />
-
-        <b className="text-sm">Buying for work?</b>
-        <br />
-        <Link
-          to="/business"
-          className="text-blue-500 text-sm hover:underline"
-        >
-          Create a free business account
-        </Link>
       </div>
-
-      <hr className="my-4 border-gray-300 w-80" />
-
-      <div className="flex justify-center mt-10 gap-4 text-sm text-blue-500">
-        <Link to="/conditions" className="hover:underline">
-          Conditions of Use
-        </Link>
-        <Link to="/privacy" className="hover:underline">
-          Privacy Notice
-        </Link>
-        <Link to="/help" className="hover:underline">
-          Help
-        </Link>
-      </div>
-
-      <p className="text-xs text-center text-gray-600 mt-4">
-        © 1996–2025, Amazon.com, Inc. or its affiliates
-      </p>
     </div>
   );
 };
