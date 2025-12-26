@@ -11,15 +11,38 @@ const ProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Map URL-friendly category names to actual product categories
-  const categoryMap = {
-    Fashion: ["men's fashion", "women's fashion"],
-    Mobiles: ["mobile phones", "computers", "mobiles & accessories"],
+  // Map main categories to DB categories
+  const mainCategoryMap = {
+    Fashion: ["men's fashion", "women's fashion", "fashion"],
+    Mobiles: ["mobile phones", "mobiles & accessories", "mobiles", "computers"],
     Electronics: ["electronics", "tv, appliances, electronics", "digital content and devices"],
     "Bestsellers": ["bestsellers"],
     "Todays Deals": ["deals"],
     "New Releases": ["new"],
     "Home & Kitchen": ["home appliances", "kitchen", "furniture", "decor"],
+  };
+
+  // Optional: subcategories mapped to main categories
+  const subCategoryMap = {
+    "Shoes": "men's fashion",
+    "Casual Shirt": "men's fashion",
+    "T-shirts": "men's fashion",
+    "Jeans": "men's fashion",
+    "Nike Sports Shoes": "men's fashion",
+    "Adidas Sports Shoes": "men's fashion",
+    "Summer Dress": "women's fashion",
+    "Handbag": "women's fashion",
+    "Winter Dress": "women's fashion",
+    "Laptops": "mobiles",
+    "Tablets": "mobiles",
+    "Power Banks": "mobiles",
+    "Televisions": "tv, appliances, electronics",
+    "Headphones": "tv, appliances, electronics",
+    "Refrigerators": "tv, appliances, electronics",
+    "Washing Machines": "tv, appliances, electronics",
+    "Echo Dot": "digital content and devices",
+    "Fire TV Stick": "digital content and devices",
+    "Apple Watch Series 9": "digital content and devices",
   };
 
   const normalize = (str) => (str || "").toLowerCase().trim();
@@ -31,8 +54,8 @@ const ProductsPage = () => {
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
 
-      const finalCategory = categoryName || params.get("category") || "All categories";
-      const mappedCategories = categoryMap[finalCategory] || [normalize(finalCategory)];
+      const currentCategory = categoryName || params.get("category") || "All categories";
+      const mappedCategories = mainCategoryMap[currentCategory] || [normalize(currentCategory)];
       const searchWords = searchTerm.toLowerCase().split(" ").filter(Boolean);
 
       const filtered = data.filter((p) => {
@@ -40,21 +63,26 @@ const ProductsPage = () => {
           .split(",")
           .map(normalize);
 
+        // Category match: partial includes for flexibility
         const categoryMatch =
-          finalCategory.toLowerCase() === "all categories" ||
-          productCategories.some((pc) => mappedCategories.includes(pc));
+          currentCategory.toLowerCase() === "all categories" ||
+          productCategories.some((pc) =>
+            mappedCategories.some((mc) => pc.includes(mc) || mc.includes(pc))
+          ) ||
+          subCategoryMap[currentCategory]?.toLowerCase() === productCategories[0];
 
+        // Search match
         const titleLower = (p.title || "").toLowerCase();
         const searchMatch =
-          searchWords.length === 0 ||
-          searchWords.every((word) => titleLower.includes(word));
+          searchWords.length === 0 || searchWords.every((word) => titleLower.includes(word));
 
         return categoryMatch && searchMatch;
       });
 
+      console.log("Filtered products:", filtered);
       setProducts(filtered);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching products:", err);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -71,6 +99,7 @@ const ProductsPage = () => {
         Loading products...
       </p>
     );
+
   if (products.length === 0)
     return (
       <p className="text-center text-xl text-gray-600 mt-10">
