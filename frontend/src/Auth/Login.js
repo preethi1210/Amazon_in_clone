@@ -8,11 +8,10 @@ const Login = () => {
   const [identifier, setIdentifier] = useState(""); // email or phone
   const [password, setPassword] = useState("");
   const [isPhone, setIsPhone] = useState(false);
-  const [userName, setUserName] = useState(""); // track logged-in name
+  const [userName, setUserName] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // Initialize from localStorage if available
   useEffect(() => {
     const savedIdentifier = localStorage.getItem("userIdentifier") || "";
     const savedName = localStorage.getItem("userName") || "";
@@ -22,7 +21,7 @@ const Login = () => {
     if (savedName) setUserName(savedName);
     if (savedIdentifier && token) setIsLoggedIn(true);
 
-    setIsPhone(/^\+?\d+$/.test(savedIdentifier));
+    setIsPhone(/^\+?\d{10,15}$/.test(savedIdentifier));
   }, []);
 
   const signIn = async () => {
@@ -32,19 +31,23 @@ const Login = () => {
     }
 
     try {
-const endpoint = `${process.env.REACT_APP_API_BASE_URL}/auth/login`;
-      console.log("API base URL:", process.env.REACT_APP_API_BASE_URL);
+      const endpoint = `${process.env.REACT_APP_API_BASE_URL}/auth/login`;
+
+      const normalizedPhone = identifier.startsWith("+")
+        ? identifier
+        : "+" + identifier;
 
       const bodyData = isPhone
-        ? { phone: identifier, password }
+        ? { phoneNumber: normalizedPhone, password } // ✅ use correct backend key
         : { email: identifier, password };
+
+      console.log("Login payload:", bodyData);
 
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
       });
-console.log("Login payload:", bodyData);
 
       const data = await res.json();
 
@@ -53,16 +56,14 @@ console.log("Login payload:", bodyData);
         return;
       }
 
-      // ✅ Store info in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("userIdentifier", identifier);
       if (data.name) localStorage.setItem("userName", data.name);
 
-      // ✅ Update state to reflect login immediately
       setUserName(data.name || "");
       setIsLoggedIn(true);
 
-      alert(data.message || "✅ Login successful!");
+      alert(data.message || "Login successful!");
       navigate("/"); // redirect to home
     } catch (err) {
       console.error("Login error:", err);
@@ -90,8 +91,9 @@ console.log("Login payload:", bodyData);
                 country="in"
                 value={identifier}
                 onChange={(value) => {
-                  setIdentifier("+" + value);
-                  setIsPhone(/^\+\d+$/.test("+" + value));
+                  const val = value.startsWith("+") ? value : "+" + value;
+                  setIdentifier(val);
+                  setIsPhone(/^\+?\d{10,15}$/.test(val));
                 }}
                 inputStyle={{ width: "100%" }}
                 countryCodeEditable={false}
@@ -103,7 +105,7 @@ console.log("Login payload:", bodyData);
                 onChange={(e) => {
                   const val = e.target.value.trim();
                   setIdentifier(val);
-                  setIsPhone(/^\+?\d+$/.test(val));
+                  setIsPhone(/^\+?\d{10,15}$/.test(val));
                 }}
                 className="w-full border border-gray-400 px-3 py-2 rounded"
               />
