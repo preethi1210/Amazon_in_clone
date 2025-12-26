@@ -47,28 +47,33 @@ const CategoryPage = () => {
           "Apple Watch Series 9": "Digital Content and Devices",
         };
 
-        let filtered = [];
+let filtered = [];
 
-        if (mainCategoryMap[category]) {
-          // If main category has array, filter by included subcategories
-          if (Array.isArray(mainCategoryMap[category])) {
-            filtered = data.filter((p) =>
-              mainCategoryMap[category].includes(p.category)
-            );
-          } else {
-            // For special categories like 'new', 'deals', etc.
-            filtered = data.filter((p) => p.type === mainCategoryMap[category]);
-          }
-        } else if (subCategoryMap[category]) {
-          const mainCat = subCategoryMap[category];
-          filtered = data.filter(
-            (p) =>
-              p.category === mainCat &&
-              p.title.toLowerCase().includes(category.toLowerCase())
-          );
-        } else {
-          filtered = data.filter((p) => p.category === category);
-        }
+const normalize = (str) => (str || "").toLowerCase().trim();
+
+if (mainCategoryMap[category]) {
+  const mapped = mainCategoryMap[category];
+
+  if (Array.isArray(mapped)) {
+    filtered = data.filter((p) =>
+      mapped.some((cat) => normalize(cat) === normalize(p.category))
+    );
+  } else {
+    // For special types
+    filtered = data.filter((p) => normalize(p.type) === normalize(mapped));
+  }
+} else if (subCategoryMap[category]) {
+  const mainCat = subCategoryMap[category];
+  filtered = data.filter(
+    (p) =>
+      normalize(p.category) === normalize(mainCat) &&
+      normalize(p.title).includes(normalize(category))
+  );
+} else {
+  filtered = data.filter((p) => normalize(p.category) === normalize(category));
+}
+console.log("API Categories:", data.map(p => p.category));
+
 
         setProducts(filtered);
       } catch (err) {
