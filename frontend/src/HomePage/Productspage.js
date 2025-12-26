@@ -53,7 +53,7 @@ const filtered = data.filter((p) => {
 
   const categoryMatch =
     cat.toLowerCase() === "all" ||
-    mappedCategories.some((mc) => productCategories.includes(mc));
+  (p.category || "").toLowerCase().includes(cat.toLowerCase());
 
   const titleLower = (p.title || "").toLowerCase();
   const searchWords = search
@@ -62,12 +62,17 @@ const filtered = data.filter((p) => {
     .split(" ")
     .filter(Boolean);
 
-  const searchMatch =
-    searchWords.length === 0 ||
-    searchWords.every((word) => titleLower.includes(word));
+const searchMatch =
+  searchWords.length === 0 ||
+  searchWords.some((word) => (p.title || "").toLowerCase().includes(word));
+
 
   return categoryMatch && searchMatch;
 });
+console.log("Product:", p.title, "Category:", p.category);
+console.log("Category:", cat);
+console.log("Search:", search);
+console.log("Filtered products:", filtered);
 
       console.log("Filtered products:", filtered);
       setProducts(filtered);
