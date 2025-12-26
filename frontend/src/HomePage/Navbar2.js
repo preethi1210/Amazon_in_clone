@@ -88,7 +88,6 @@ const Navbar2 = () => {
 <Link to="/category/Bestsellers" className={navItemClass}>Bestsellers</Link>
 <Link to="/category/Todays Deals" className={navItemClass}>Today's Deals</Link>
 <Link to="/category/New Releases" className={navItemClass}>New Releases</Link>
-<Link to="/category/Electronics" className={navItemClass}>Electronics</Link>
 
         {/* Other Nav Items with Links */}
         <Link to="/sell" className={navItemClass}>
