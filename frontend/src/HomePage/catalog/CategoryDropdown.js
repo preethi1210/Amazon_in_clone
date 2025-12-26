@@ -31,7 +31,7 @@ const CategoryDropdown = ({ onSearch }) => {
     <div className="relative w-full max-w-3xl">
       <div className="flex border rounded-lg overflow-hidden">
         <div
-          className="flex items-center gap-1 px-3 bg-gray-700 cursor-pointer"
+          className="flex items-center gap-1 px-3 bg-gray-900 cursor-pointer"
           onClick={() => setShowCategories((prev) => !prev)}
         >
           <span>{selectedCategory}</span>
@@ -45,7 +45,7 @@ const CategoryDropdown = ({ onSearch }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <button
-          className="bg-orange-500 px-3 hover:bg-orange-600 text-grey-700"
+          className="bg-orange-500 px-3 hover:bg-orange-600 text-gray-900"
           onClick={handleSearch}
         >
           <CiSearch />
