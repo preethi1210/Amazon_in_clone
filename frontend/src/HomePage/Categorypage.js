@@ -17,7 +17,7 @@ const CategoryPage = () => {
   // Main category map
   const mainCategoryMap = {
     Fashion: ["men's fashion", "women's fashion"],
-    Mobiles: ["mobiles", "computers", "mobiles & accessories"],
+    Mobiles: ["mobiles phones", "computers", "mobiles & accessories"],
     Electronics: ["electronics", "tv, appliances, electronics", "digital content and devices"],
     "Bestsellers": ["bestsellers"],
     "Todays Deals": ["deals"],
