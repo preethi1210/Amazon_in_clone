@@ -30,6 +30,7 @@ const CategoryDropdown = ({ onSearch }) => {
   return (
     <div className="relative w-full max-w-3xl">
       <div className="flex border rounded-lg overflow-hidden">
+        {/* Category selector */}
         <div
           className="flex items-center gap-1 px-3 bg-gray-200 cursor-pointer"
           onClick={() => setShowCategories((prev) => !prev)}
@@ -37,6 +38,8 @@ const CategoryDropdown = ({ onSearch }) => {
           <span>{selectedCategory}</span>
           <FaChevronDown />
         </div>
+
+        {/* Search input */}
         <input
           type="text"
           placeholder="Search products..."
@@ -44,6 +47,8 @@ const CategoryDropdown = ({ onSearch }) => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+
+        {/* Search button */}
         <button
           className="bg-orange-500 px-3 hover:bg-orange-600 text-white"
           onClick={handleSearch}
@@ -52,6 +57,7 @@ const CategoryDropdown = ({ onSearch }) => {
         </button>
       </div>
 
+      {/* Dropdown menu */}
       {showCategories && (
         <div className="absolute top-full left-0 mt-1 w-full bg-white border shadow-lg z-50">
           {categories.map((cat) => (
