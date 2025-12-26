@@ -2,12 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Product from "./Product";
 
-const categoryMap = {
-  "Fashion": ["Men's Fashion", "Women's Fashion"],
-  "Mobiles": ["Mobiles, Computers"],
-  "Electronics": ["TV, Appliances, Electronics", "Digital Content and Devices"],
-};
-
 const CategoryPage = () => {
   const { category } = useParams();
   const [products, setProducts] = useState([]);
@@ -17,11 +11,11 @@ const CategoryPage = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
         const data = await res.json();
-  
-        // ✅ Main category map
-        const categoryMap = {
+
+        // Main category map
+        const mainCategoryMap = {
           "Fashion": ["Men's Fashion", "Women's Fashion"],
           "Mobiles": ["Mobiles, Computers"],
           "Electronics": ["TV, Appliances, Electronics", "Digital Content and Devices"],
@@ -29,8 +23,8 @@ const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
           "Todays Deals": "deals",
           "Bestsellers": "bestsellers",
         };
-  
-        // ✅ Subcategory map
+
+        // Subcategory map
         const subCategoryMap = {
           "Shoes": "Men's Fashion",
           "Casual Shirt": "Men's Fashion",
@@ -52,38 +46,41 @@ const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
           "Fire TV Stick": "Digital Content and Devices",
           "Apple Watch Series 9": "Digital Content and Devices",
         };
-  
+
         let filtered = [];
-  
-        // ✅ Check if it's a main category
-        if (categoryMap[category]) {
-          filtered = data.filter((p) => categoryMap[category].includes(p.category));
-        }
-        // ✅ Check if it's a subcategory
-        else if (subCategoryMap[category]) {
+
+        if (mainCategoryMap[category]) {
+          // If main category has array, filter by included subcategories
+          if (Array.isArray(mainCategoryMap[category])) {
+            filtered = data.filter((p) =>
+              mainCategoryMap[category].includes(p.category)
+            );
+          } else {
+            // For special categories like 'new', 'deals', etc.
+            filtered = data.filter((p) => p.type === mainCategoryMap[category]);
+          }
+        } else if (subCategoryMap[category]) {
           const mainCat = subCategoryMap[category];
           filtered = data.filter(
             (p) =>
               p.category === mainCat &&
               p.title.toLowerCase().includes(category.toLowerCase())
           );
-        }
-        // ✅ Otherwise exact match
-        else {
+        } else {
           filtered = data.filter((p) => p.category === category);
         }
-  
+
         setProducts(filtered);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch products:", err);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchProducts();
   }, [category]);
-  
+
   if (loading) return <p>Loading products...</p>;
   if (products.length === 0) return <p>No products found for "{category}"</p>;
 
