@@ -15,65 +15,52 @@ const ProductsPage = () => {
   const pathCategory = pathParams.categoryName || "";
 
   // Final category to filter
-  const category = pathCategory || queryCategory || "All";
+  const category = pathCategory || queryCategory || "All categories";
 
-  const fetchProducts = async (cat = "All", search = "") => {
+  // Category mapping for main categories
+  const categoryMap = {
+    Fashion: ["men's fashion", "women's fashion"],
+    Mobiles: ["mobiles", "computers", "mobiles & accessories"],
+    Electronics: ["electronics", "tv, appliances, electronics", "digital content and devices"],
+    "Bestsellers": ["bestsellers"],
+    "Todays Deals": ["deals"],
+    "New Releases": ["new"],
+  };
+
+  const fetchProducts = async () => {
     setLoading(true);
     try {
+      // ✅ Fetch all products without query params
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
       if (!res.ok) throw new Error("Failed to fetch products");
 
       const data = await res.json();
       console.log("All products from API:", data);
 
-      // Normalize search terms
-      const searchWords = search
-        .toLowerCase()
-        .trim()
-        .split(" ")
-        .filter(Boolean);
-const categoryMap = {
-  Fashion: ["men's fashion", "women's fashion"],
-  Mobiles: ["mobile phones", "computers", "mobiles & accessories"],
-  Electronics: ["electronics", "tv, appliances, electronics", "digital content and devices"],
-  Bestsellers: ["bestsellers"],
-  "Todays Deals": ["deals"],
-  "New Releases": ["new"],
-};
+      // Normalize category and search
+      const normalize = (str) => (str || "").toLowerCase().trim();
+      const searchWords = searchTerm.toLowerCase().split(" ").filter(Boolean);
 
+      // Filter products locally
+      const filtered = data.filter((p) => {
+        const productCategories = (p.category || "")
+          .split(",")
+          .map((c) => normalize(c));
 
-      // Filter products
-const filtered = data.filter((p) => {
-  const productCategories = (p.category || "")
-    .split(",")
-    .map((c) => c.toLowerCase().trim());
+        // Map current category
+        const mappedCategories = categoryMap[category] || [normalize(category)];
 
-  const mappedCategories = categoryMap[cat] || [cat.toLowerCase()];
+        const categoryMatch =
+          category.toLowerCase() === "all categories" ||
+          productCategories.some((pc) => mappedCategories.includes(pc));
 
-  // categoryMatch: any of the mapped categories appear in product
-  const categoryMatch =
-    cat.toLowerCase() === "all" ||
-    mappedCategories.some((mc) => productCategories.includes(mc));
+        const titleLower = (p.title || "").toLowerCase();
+        const searchMatch =
+          searchWords.length === 0 ||
+          searchWords.every((word) => titleLower.includes(word));
 
-  const titleLower = (p.title || "").toLowerCase();
-
-  const searchWordsLower = search
-    .toLowerCase()
-    .trim()
-    .split(" ")
-    .filter(Boolean);
-
-  const searchMatch =
-    searchWordsLower.length === 0 ||
-    searchWordsLower.every((word) => titleLower.includes(word));
-console.log("Product:", p.title, "Category:", p.category);
-console.log("Category:", cat);
-console.log("Search:", search);
-console.log("Filtered products:", filtered);
-  return categoryMatch && searchMatch;
-});
-
-
+        return categoryMatch && searchMatch;
+      });
 
       console.log("Filtered products:", filtered);
       setProducts(filtered);
@@ -86,7 +73,7 @@ console.log("Filtered products:", filtered);
   };
 
   useEffect(() => {
-    fetchProducts(category, searchTerm);
+    fetchProducts();
   }, [category, searchTerm]);
 
   return (
@@ -96,7 +83,9 @@ console.log("Filtered products:", filtered);
           Loading products...
         </p>
       ) : products.length === 0 ? (
-        <p className="text-center text-xl text-gray-600">No products found</p>
+        <p className="text-center text-xl text-gray-600">
+          No products found for "{category}"
+        </p>
       ) : (
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map((p) => (
