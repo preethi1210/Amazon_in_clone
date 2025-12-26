@@ -38,7 +38,7 @@ const Login = () => {
         : "+" + identifier;
 
       const bodyData = isPhone
-        ? { phoneNumber: normalizedPhone, password } // ✅ use correct backend key
+        ? { phone: normalizedPhone, password } // ✅ use correct backend key
         : { email: identifier, password };
 
       console.log("Login payload:", bodyData);
@@ -104,8 +104,12 @@ const Login = () => {
                 value={identifier}
                 onChange={(e) => {
                   const val = e.target.value.trim();
-                  setIdentifier(val);
-                  setIsPhone(/^\+?\d{10,15}$/.test(val));
+  let formatted = val.replace(/\D/g, ""); // remove non-digits
+  if (formatted.length === 10) formatted = "+91" + formatted;
+  else if (!formatted.startsWith("+")) formatted = "+" + formatted;
+  setIdentifier(formatted);
+  setIsPhone(/^\+\d{10,15}$/.test(formatted));
+
                 }}
                 className="w-full border border-gray-400 px-3 py-2 rounded"
               />
