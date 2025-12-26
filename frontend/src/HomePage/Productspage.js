@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Product from "./Product";
-
-// Optional category mapping for special handling
-const categoryMap = {
-  Fashion: ["Men's Fashion", "Women's Fashion"],
-  Mobiles: ["Mobile Phones", "Computers", "Mobiles & Accessories"],
-  Electronics: ["Electronics", "TV, Appliances, Electronics", "Digital Content and Devices"],
-  Bestsellers: "bestsellers",
-  "Todays Deals": "deals",
-  "New Releases": "new",
-};
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -24,32 +14,23 @@ const ProductsPage = () => {
   const pathParams = useParams();
   const pathCategory = pathParams.categoryName || "";
 
-  // Determine current category: path param > query param > default
-  const category = pathCategory || queryCategory || "All categories";
+  const category = pathCategory || queryCategory || "All";
 
-  const navigate = useNavigate();
-
-  // Fetch products from API
-  const fetchProducts = async (cat = "All categories", search = "") => {
+  const fetchProducts = async (cat = "All", search = "") => {
     setLoading(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
       const data = await res.json();
+      console.log("All products from API:", data);
 
       const filtered = data.filter((p) => {
-        // Split product categories by comma and normalize
-        const productCategories = p.category
+        const productCategories = (p.category || "")
           .split(",")
           .map((c) => c.toLowerCase().trim());
 
-        // --- Category matching ---
         const categoryMatch =
-          !cat ||
-          cat.toLowerCase() === "all" ||
-          cat.toLowerCase() === "all categories" ||
-          productCategories.includes(cat.toLowerCase().trim());
+          cat.toLowerCase() === "all" || productCategories.includes(cat.toLowerCase().trim());
 
-        // --- Partial & multi-word search ---
         const searchWords = search
           .toLowerCase()
           .trim()
@@ -72,23 +53,12 @@ const ProductsPage = () => {
     }
   };
 
-  // Initial fetch on page load based on URL params
   useEffect(() => {
     fetchProducts(category, searchTerm);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // only runs once; dropdown does NOT trigger this fetch
-
-  // Hide category dropdown/sidebar on this page
-  const showCategoryDropdown = false;
+  }, [category, searchTerm]);
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-      {/* Optional dropdown - hidden on page load */}
-      {showCategoryDropdown && (
-        <div className="mb-6">{/* Enable dropdown here if needed */}</div>
-      )}
-
-      {/* Products Grid */}
       {loading ? (
         <p className="text-center text-xl text-gray-600 animate-pulse">
           Loading products...
