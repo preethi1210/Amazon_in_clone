@@ -1,90 +1,103 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Product from "./Product";
 
 const CategoryPage = () => {
-  const { category } = useParams();
+  const { category: pathCategory } = useParams();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const queryCategory = params.get("category") || "";
+  const searchTerm = params.get("q") || "";
+
+  const category = pathCategory || queryCategory || "All categories";
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Main category map
+  const mainCategoryMap = {
+    Fashion: ["men's fashion", "women's fashion"],
+    Mobiles: ["mobiles", "computers", "mobiles & accessories"],
+    Electronics: ["electronics", "tv, appliances, electronics", "digital content and devices"],
+    "Bestsellers": ["bestsellers"],
+    "Todays Deals": ["deals"],
+    "New Releases": ["new"],
+  };
+
+  // Subcategory map (optional)
+  const subCategoryMap = {
+    "Shoes": "men's fashion",
+    "Casual Shirt": "men's fashion",
+    "T-shirts": "men's fashion",
+    "Jeans": "men's fashion",
+    "Nike Sports Shoes": "men's fashion",
+    "Adidas Sports Shoes": "men's fashion",
+    "Summer Dress": "women's fashion",
+    "Handbag": "women's fashion",
+    "Winter Dress": "women's fashion",
+    "Laptops": "mobiles",
+    "Tablets": "mobiles",
+    "Power Banks": "mobiles",
+    "Televisions": "tv, appliances, electronics",
+    "Headphones": "tv, appliances, electronics",
+    "Refrigerators": "tv, appliances, electronics",
+    "Washing Machines": "tv, appliances, electronics",
+    "Echo Dot": "digital content and devices",
+    "Fire TV Stick": "digital content and devices",
+    "Apple Watch Series 9": "digital content and devices",
+  };
+
+  const normalize = (str) => (str || "").toLowerCase().trim();
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      // Fetch all products
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
+      if (!res.ok) throw new Error("Failed to fetch products");
+      const data = await res.json();
+
+      // Filter products locally
+      const filtered = data.filter((p) => {
+        const productCategory = normalize(p.category);
+        const title = normalize(p.title);
+
+        let categoryMatch = false;
+
+        if (category.toLowerCase() === "all categories") {
+          categoryMatch = true;
+        } else if (mainCategoryMap[category]) {
+          const mappedCats = mainCategoryMap[category].map(normalize);
+          categoryMatch = mappedCats.includes(productCategory);
+        } else if (subCategoryMap[category]) {
+          categoryMatch = normalize(subCategoryMap[category]) === productCategory;
+        } else {
+          categoryMatch = category.toLowerCase() === productCategory;
+        }
+
+        const searchWords = searchTerm
+          .toLowerCase()
+          .split(" ")
+          .filter(Boolean);
+        const searchMatch =
+          searchWords.length === 0 || searchWords.every((word) => title.includes(word));
+
+        return categoryMatch && searchMatch;
+      });
+
+      console.log("Filtered products:", filtered);
+      setProducts(filtered);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
-        const data = await res.json();
-
-        // Main category map
-        const mainCategoryMap = {
-          "Fashion": ["Men's Fashion", "Women's Fashion"],
-          "Mobiles": ["Mobiles, Computers"],
-          "Electronics": ["TV, Appliances, Electronics", "Digital Content and Devices"],
-          "New Releases": "new",
-          "Todays Deals": "deals",
-          "Bestsellers": "bestsellers",
-        };
-
-        // Subcategory map
-        const subCategoryMap = {
-          "Shoes": "Men's Fashion",
-          "Casual Shirt": "Men's Fashion",
-          "T-shirts": "Men's Fashion",
-          "Jeans": "Men's Fashion",
-          "Nike Sports Shoes": "Men's Fashion",
-          "Adidas Sports Shoes": "Men's Fashion",
-          "Summer Dress": "Women's Fashion",
-          "Handbag": "Women's Fashion",
-          "Winter Dress": "Women's Fashion",
-          "Laptops": "Mobiles, Computers",
-          "Tablets": "Mobiles, Computers",
-          "Power Banks": "Mobiles, Computers",
-          "Televisions": "TV, Appliances, Electronics",
-          "Headphones": "TV, Appliances, Electronics",
-          "Refrigerators": "TV, Appliances, Electronics",
-          "Washing Machines": "TV, Appliances, Electronics",
-          "Echo Dot": "Digital Content and Devices",
-          "Fire TV Stick": "Digital Content and Devices",
-          "Apple Watch Series 9": "Digital Content and Devices",
-        };
-
-let filtered = [];
-
-const normalize = (str) => (str || "").toLowerCase().trim();
-
-if (mainCategoryMap[category]) {
-  const mapped = mainCategoryMap[category];
-
-  if (Array.isArray(mapped)) {
-    filtered = data.filter((p) =>
-      mapped.some((cat) => normalize(cat) === normalize(p.category))
-    );
-  } else {
-    // For special types
-    filtered = data.filter((p) => normalize(p.type) === normalize(mapped));
-  }
-} else if (subCategoryMap[category]) {
-  const mainCat = subCategoryMap[category];
-  filtered = data.filter(
-    (p) =>
-      normalize(p.category) === normalize(mainCat) &&
-      normalize(p.title).includes(normalize(category))
-  );
-} else {
-  filtered = data.filter((p) => normalize(p.category) === normalize(category));
-}
-console.log("API Categories:", data.map(p => p.category));
-
-
-        setProducts(filtered);
-      } catch (err) {
-        console.error("Failed to fetch products:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProducts();
-  }, [category]);
+  }, [category, searchTerm]);
 
   if (loading) return <p>Loading products...</p>;
   if (products.length === 0) return <p>No products found for "{category}"</p>;
