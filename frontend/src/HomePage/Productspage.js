@@ -19,7 +19,7 @@ const ProductsPage = () => {
     "Bestsellers": ["bestsellers"],
     "Todays Deals": ["deals"],
     "New Releases": ["new"],
-    "Home & Kitchen": ["home appliances", "kitchen", "furniture", "decor"], // example
+    "Home & Kitchen": ["home appliances", "kitchen", "furniture", "decor"],
   };
 
   const normalize = (str) => (str || "").toLowerCase().trim();
@@ -27,11 +27,11 @@ const ProductsPage = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await fetch(${process.env.REACT_APP_API_BASE_URL}/products);
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products`);
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
 
-      const finalCategory = categoryName || "All categories";
+      const finalCategory = categoryName || params.get("category") || "All categories";
       const mappedCategories = categoryMap[finalCategory] || [normalize(finalCategory)];
       const searchWords = searchTerm.toLowerCase().split(" ").filter(Boolean);
 
@@ -66,19 +66,30 @@ const ProductsPage = () => {
   }, [categoryName, searchTerm]);
 
   if (loading)
-    return <p className="text-center mt-10 text-lg">Loading products...</p>;
+    return (
+      <p className="text-center text-xl text-gray-600 animate-pulse mt-10">
+        Loading products...
+      </p>
+    );
   if (products.length === 0)
     return (
-      <p className="text-center mt-10 text-lg">
+      <p className="text-center text-xl text-gray-600 mt-10">
         No products found for "{categoryName || 'All categories'}"
       </p>
     );
 
   return (
-    <div className="p-6 grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {products.map((p) => (
-        <Product key={p._id} {...p} />
-      ))}
+    <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+      <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {products.map((p) => (
+          <div
+            key={p._id}
+            className="transform transition-all hover:-translate-y-2 hover:scale-105 hover:shadow-xl bg-white p-4 rounded-2xl shadow-md"
+          >
+            <Product {...p} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
