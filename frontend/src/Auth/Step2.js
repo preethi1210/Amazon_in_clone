@@ -1,7 +1,6 @@
-// src/Auth/Step2.js
 import React, { useEffect, useState } from "react";
 import amazon from "../HomePage/images/Amazon_black.png";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Step2 = () => {
   const [identifier, setIdentifier] = useState("");
@@ -9,13 +8,20 @@ const Step2 = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedIdentifier = localStorage.getItem("userIdentifier");
-    const savedName = localStorage.getItem("userName");
+    const savedIdentifier = localStorage.getItem("userIdentifier") || "";
+    const savedName = localStorage.getItem("userName") || "";
     if (savedIdentifier) setIdentifier(savedIdentifier);
     if (savedName) setName(savedName);
   }, []);
 
   const proceed = () => {
+    // Ensure phone is in +91 format if 10 digits
+    let formattedIdentifier = identifier;
+    if (/^\d{10}$/.test(identifier)) {
+      formattedIdentifier = "+91" + identifier;
+      localStorage.setItem("userIdentifier", formattedIdentifier);
+    }
+
     navigate("/register");
   };
 
@@ -46,36 +52,7 @@ const Step2 = () => {
         >
           Proceed to create an account
         </button>
-
-        <hr className="my-4 border-gray-300" />
-
-        <b className="text-sm">Already a customer?</b>
-        <br />
-        <Link
-          to="/signin"
-          className="text-blue-500 text-sm hover:underline"
-        >
-          Sign in with another email or mobile
-        </Link>
       </div>
-
-      <hr className="my-4 border-gray-500 w-80" />
-
-      <div className="flex justify-center mt-10 gap-4 text-sm text-blue-500">
-        <Link to="/conditions" className="hover:underline">
-          Conditions of Use
-        </Link>
-        <Link to="/privacy" className="hover:underline">
-          Privacy Notice
-        </Link>
-        <Link to="/help" className="hover:underline">
-          Help
-        </Link>
-      </div>
-
-      <p className="text-xs text-center text-gray-600 mt-4">
-        © 1996–2025, Amazon.com, Inc. or its affiliates
-      </p>
     </div>
   );
 };
