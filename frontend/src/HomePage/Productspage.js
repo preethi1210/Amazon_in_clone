@@ -11,39 +11,19 @@ const ProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Map URL-friendly category names to actual product categories
-  const categoryMap = {
-    Fashion: ["men's fashion", "women's fashion"],
-    Mobiles: ["mobile phones", "computers", "mobiles & accessories"],
-    Electronics: ["electronics", "tv, appliances, electronics", "digital content and devices"],
-    "Bestsellers": ["bestsellers"],
-    "Todays Deals": ["deals"],
-    "New Releases": ["new"],
-    "Home & Kitchen": ["home appliances", "kitchen", "furniture", "decor"], // example
-  };
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const url = new URL(`${process.env.REACT_APP_API_BASE_URL}/products`);
+      if (categoryName) url.searchParams.append("category", categoryName);
+      if (searchTerm) url.searchParams.append("q", searchTerm);
 
-  const normalize = (str) => (str || "").toLowerCase().trim();
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to fetch products");
 
-const fetchProducts = async () => {
-  setLoading(true);
-  try {
-    const url = new URL(`${process.env.REACT_APP_API_BASE_URL}/products`);
-    
-    if (categoryName) url.searchParams.append("category", categoryName);
-    if (searchTerm) url.searchParams.append("q", searchTerm);
-
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("Failed to fetch products");
-
-    const data = await res.json();
-    setProducts(data);
-  } catch (err) {
-    console.error(err);
-    setProducts([]);
-  } finally {
-    setLoading(false);
-  }
- catch (err) {
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
       console.error(err);
       setProducts([]);
     } finally {
@@ -57,6 +37,7 @@ const fetchProducts = async () => {
 
   if (loading)
     return <p className="text-center mt-10 text-lg">Loading products...</p>;
+
   if (products.length === 0)
     return (
       <p className="text-center mt-10 text-lg">
