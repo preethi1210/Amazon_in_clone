@@ -20,7 +20,7 @@ import orderRoutes from "./routes/order.js";
 import paymentsRoutes from "./routes/payment.js";
 
 const app = express();
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://amazon-in-clone-2.onrender.com";
 
 app.use(cors({ origin: FRONTEND_URL, credentials: true }));
 app.use(express.json());
